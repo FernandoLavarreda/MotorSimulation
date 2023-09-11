@@ -135,7 +135,7 @@ public class Cam extends Link{
 		}
 		for(counter=0;counter<angs.length;counter++){
 			angs[counter] = angles[counter];
-			rads[counter] = rads[counter];
+			rads[counter] = radiuses[counter];
 		}
 		
 		return new Cam(crvs, cons, angs, rads);

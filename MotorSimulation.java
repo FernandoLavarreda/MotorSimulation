@@ -15,11 +15,15 @@ public class MotorSimulation{
 		}catch (Exception e) {
 			System.out.println(e);
 		}
-		
+		String followerInLoc = "C:\\Users\\ferna\\Downloads\\followeri.csv";
+		String camInLoc = "C:\\Users\\ferna\\Downloads\\cami.csv";
+		String followerOutLoc = "C:\\Users\\ferna\\Downloads\\followero.csv";
+		String camOutLoc = "C:\\Users\\ferna\\Downloads\\camo.csv";
 		JFrame frame = new JFrame("MotorSim");
 		SliderCrank mech = MotorSimulation.buildPiston();
-		CamFollower camf = MotorSimulation.buildCamFollower();
-		frame.add(new Animation(mech, camf));
+		CamFollower camIn = MotorSimulation.buildCamFollower(followerInLoc, camInLoc, Math.PI/4, new Vector(200, 200));
+		CamFollower camOut = MotorSimulation.buildCamFollower(followerOutLoc, camOutLoc, Math.PI*0.75, new Vector(400, 200));
+		frame.add(new Animation(mech, camIn, camOut));
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
@@ -37,18 +41,18 @@ public class MotorSimulation{
 		crank.setConnections(conCrank);
 		coupler.setConnections(conCoupler);
 		piston.setConnections(conPiston);
-		return new SliderCrank(links, 0, Math.PI/2, new Vector(400, 600));
+		return new SliderCrank(links, 0, Math.PI/2, new Vector(300, 600));
 	}
 	
 	
-	public static CamFollower buildCamFollower() throws IOException{
-		Link follower = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\followeri.csv")));
-		Cam cam = Cam.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\cami.csv")));
+	public static CamFollower buildCamFollower(String followerLoc, String camLoc, double rotation, Vector place) throws IOException{
+		Link follower = Link.buildIO(new FileInputStream(new File(followerLoc)));
+		Cam cam = Cam.buildIO(new FileInputStream(new File(camLoc)));
 		Vector[] conFollower = {new Vector(0, 0), new Vector(0, 0)};
 		Vector[] conCam = {new Vector(0, 0), new Vector(0, 0)};
 		follower.setConnections(conFollower);
 		cam.setConnections(conCam);
-		return new CamFollower(cam, follower, new Vector(0, 0), Math.PI/4, new Vector(300, 200));
+		return new CamFollower(cam, follower, new Vector(0, 0), rotation, place);
 	}
 	
 	

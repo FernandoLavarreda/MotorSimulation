@@ -21,8 +21,8 @@ public class CamFollower{
 	
 	public Link[] solve(double rad){
 		Link[] lnks = new Link[2];
-		lnks[0] = cam.rotate(rad).translate(absoluteCoords);
-		double radius = cam.getLift(rad-rotation*5);
+		lnks[0] = cam.rotate(rad+Math.PI).translate(absoluteCoords);
+		double radius = cam.getLift(rad-rotation);
 		double dx = radius*Math.cos(rotation)+absoluteCoords.getX();
 		double dy = radius*Math.sin(rotation)+absoluteCoords.getY();
 		lnks[1] = follower.translate(dx, dy);
@@ -31,14 +31,17 @@ public class CamFollower{
 	
 	
 	public CamFollower copy(){
-		return new CamFollower(cam.copy(), follower.copy(), camCenter, rotation, absoluteCoords);
+		return new CamFollower(cam.copy(), follower.copy().rotate(-rotation), camCenter, rotation, absoluteCoords);
 	}
 	
 	
 	public CamFollower copy(Vector absoluteCoords){
-		return new CamFollower(cam.copy(), follower.copy(), camCenter, rotation, absoluteCoords);
+		return new CamFollower(cam.copy(), follower.copy().rotate(-rotation), camCenter, rotation, absoluteCoords);
 	}
-
+	
+	public Vector getAbsoluteCoords(){
+		return absoluteCoords;
+	}
 
 }
 
