@@ -12,20 +12,21 @@ public class MotorSimulation{
 	public static void main(String[] args) throws IOException{
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
-			//UIManager.setLookAndFeel(new FlatIntelliJLaf());
 		}catch (Exception e) {
 			System.out.println(e);
 		}
 		
 		JFrame frame = new JFrame("MotorSim");
-		SliderCrank mech = MotorSimulation.buildMotor();
-		frame.add(new Animation(mech));
+		SliderCrank mech = MotorSimulation.buildPiston();
+		CamFollower camf = MotorSimulation.buildCamFollower();
+		frame.add(new Animation(mech, camf));
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 	
-	public static SliderCrank buildMotor() throws IOException{
+	
+	public static SliderCrank buildPiston() throws IOException{
 		Link piston = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\cabezal.csv")));
 		Link crank = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\ciguenal.csv")));
 		Link coupler = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\biela.csv")));
@@ -38,5 +39,18 @@ public class MotorSimulation{
 		piston.setConnections(conPiston);
 		return new SliderCrank(links, 0, Math.PI/2, new Vector(400, 600));
 	}
+	
+	
+	public static CamFollower buildCamFollower() throws IOException{
+		Link follower = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\followeri.csv")));
+		Cam cam = Cam.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\cami.csv")));
+		Vector[] conFollower = {new Vector(0, 0), new Vector(0, 0)};
+		Vector[] conCam = {new Vector(0, 0), new Vector(0, 0)};
+		follower.setConnections(conFollower);
+		cam.setConnections(conCam);
+		return new CamFollower(cam, follower, new Vector(0, 0), Math.PI/4, new Vector(300, 200));
+	}
+	
+	
 
 }

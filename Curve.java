@@ -64,6 +64,16 @@ public class Curve{
 	}
 	
 	
+	public Curve copy(){
+		Vector[] nvectors = new Vector[vectors.length];
+		int counter = 0;
+		for(Vector t: vectors){
+			nvectors[counter++] = t.copy();
+		}
+		return new Curve(nvectors);
+	}
+	
+	
 	public String toString(){
 		StringBuilder str = new StringBuilder(200);
 		for(Vector t: vectors){

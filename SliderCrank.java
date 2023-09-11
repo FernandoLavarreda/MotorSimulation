@@ -24,6 +24,11 @@ public class SliderCrank{
 	}
 	
 	
+	public Vector getAbsoluteCoords(){
+		return absoluteCoords;
+	}
+	
+	
 	public Link[] solve(double rad, boolean inversion){
 		double angle_coupler, dx, dy;
 		Link[] lnks = new Link[3];
@@ -43,6 +48,22 @@ public class SliderCrank{
 		dy = lnks[1].getConnection(1).getY()-links[2].getConnection(0).getY();
 		lnks[2] = links[2].translate(dx, dy);
 		return lnks;
+	}
+	
+	
+	public SliderCrank copy(){
+		return copy(absoluteCoords.copy());
+	}
+	
+	
+	public SliderCrank copy(Vector absoluteCoords){
+		Link[] lnks = new Link[3];
+		int counter = 0;
+		for(Link t: links){
+			lnks[counter++] = t.copy();
+		}
+		lnks[2] = lnks[2].rotate(rotation);
+		return new SliderCrank(lnks, displacement, rotation, absoluteCoords);
 	}
 	
 }

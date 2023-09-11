@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 
 public class Link{
-	private Curve[] curves;
-	private Vector[] connections;
+	protected Curve[] curves;
+	protected Vector[] connections;
 	
 	public Link(Curve[] curves, Vector[] connections){
 		this.curves = curves;
@@ -176,6 +176,21 @@ public class Link{
 		}
 		
 		return new Link(ncurves, nvectors);
+	}
+	
+	
+	public Link copy(){
+		Curve[] crvs = new Curve[curves.length];
+		Vector[] cons = new Vector[connections.length];
+		int counter = 0;
+		for(Curve c: curves){
+			crvs[counter++] = c.copy();
+		}
+		counter = 0;
+		for(Vector v: connections){
+			cons[counter++] = v.copy();
+		}
+		return new Link(crvs, cons);
 	}
 	
 	

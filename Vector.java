@@ -72,6 +72,11 @@ public class Vector{
 	}
 	
 	
+	public Vector copy(){
+		return new Vector(x, y);
+	}
+	
+	
 	public String toString(){
 		return "x: "+x+"\ny: "+y;
 	}
