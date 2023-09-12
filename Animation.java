@@ -1,26 +1,28 @@
-
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.Arrays;
 import java.util.ArrayList;
 
+
 public class Animation extends JPanel implements ActionListener{
 	private Timer timer;
 	private JSlider speed;
 	private JLabel speedMarker;
-	private Link[] snapshot;
+	private Link[] snapshot, background;
 	private SliderCrank[] pistons;
 	private CamFollower[] camfollowers;
 	private double instantRotationPistons;
 	private double instantRotationFollowers;
 	private double[] anglePistons, angleCams;
 	private int cores;
+	private static int c = 1;
 	
-	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut){
+	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background){
 		super();
-		int separation = 0;
 		cores = 2;
+		int separation = 300;
+		
 		pistons = new SliderCrank[] {
 									 mechanism, 
 									 mechanism.copy(mechanism.getAbsoluteCoords().translate(separation, 0)),
@@ -39,14 +41,15 @@ public class Animation extends JPanel implements ActionListener{
 										  camfollowerOut.copy(camfollowerOut.getAbsoluteCoords().translate(separation*3, 0))
 										  };
 		timer = new Timer(1, this);
-		snapshot = new Link[28];
+		snapshot = new Link[28+background.length];
+		System.arraycopy(background, 0, snapshot, 28, background.length);
 		anglePistons = new double[] {0, Math.PI, Math.PI, 0};
 		//Max intake cam at 108° afeter TDC
 		//Max exhaust cam at 112°C before TDC
 		//Firing 1-3-4-2
 		angleCams = new double[] {
-								  Math.PI/180*85, -Math.PI/180*5, Math.PI/180*175, -Math.PI/180*95,
-								  Math.PI/180*60, -Math.PI/180*30, Math.PI/180*150, -Math.PI/180*170
+								  Math.PI/180*115, Math.PI/180*25, -Math.PI/180*145, -Math.PI/180*65,
+								  Math.PI/180*35, -Math.PI/180*55, Math.PI/180*125, -Math.PI/180*145
 								 };
 		speed = new JSlider();
 		speedMarker = new JLabel();
@@ -54,6 +57,7 @@ public class Animation extends JPanel implements ActionListener{
 		add(speedMarker);
 		updateSnapshot();
 		timer.start();
+		setPreferredSize(new Dimension(600, 900));
 	}
 	
 	
@@ -150,6 +154,7 @@ public class Animation extends JPanel implements ActionListener{
 		updateSnapshot();
 		repaint();
 	}
+	
 	
 }
 

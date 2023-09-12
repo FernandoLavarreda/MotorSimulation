@@ -19,11 +19,18 @@ public class MotorSimulation{
 		String camInLoc = "C:\\Users\\ferna\\Downloads\\cami.csv";
 		String followerOutLoc = "C:\\Users\\ferna\\Downloads\\followero.csv";
 		String camOutLoc = "C:\\Users\\ferna\\Downloads\\camo.csv";
-		JFrame frame = new JFrame("MotorSim");
+		String chamber = "C:\\Users\\ferna\\Downloads\\chamber.csv";
+		
+		
 		SliderCrank mech = MotorSimulation.buildPiston();
-		CamFollower camIn = MotorSimulation.buildCamFollower(followerInLoc, camInLoc, Math.PI/4, new Vector(200, 200));
-		CamFollower camOut = MotorSimulation.buildCamFollower(followerOutLoc, camOutLoc, Math.PI*0.75, new Vector(400, 200));
-		frame.add(new Animation(mech, camIn, camOut));
+		CamFollower camIn = MotorSimulation.buildCamFollower(followerInLoc, camInLoc, Math.PI/180*70, new Vector(246, 205));
+		CamFollower camOut = MotorSimulation.buildCamFollower(followerOutLoc, camOutLoc, Math.PI/180*110, new Vector(359, 210));
+		Link backgroundLink = Link.buildIO(new FileInputStream(new File(chamber))).rotate(Math.PI).translate(300, 550);
+		Link[] background  = {backgroundLink, backgroundLink.translate(300, 0), backgroundLink.translate(600, 0), backgroundLink.translate(900, 0)};
+		
+		
+		JFrame frame = new JFrame("MotorSim");
+		frame.add(new Animation(mech, camIn, camOut, background));
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
@@ -41,7 +48,7 @@ public class MotorSimulation{
 		crank.setConnections(conCrank);
 		coupler.setConnections(conCoupler);
 		piston.setConnections(conPiston);
-		return new SliderCrank(links, 0, Math.PI/2, new Vector(300, 600));
+		return new SliderCrank(links, 0, Math.PI/2, new Vector(300, 550));
 	}
 	
 	
@@ -53,8 +60,5 @@ public class MotorSimulation{
 		follower.setConnections(conFollower);
 		cam.setConnections(conCam);
 		return new CamFollower(cam, follower, new Vector(0, 0), rotation, place);
-	}
-	
-	
-
+	}	
 }
