@@ -1,7 +1,7 @@
 
 
 
-public class CamFollower{
+public class CamFollower implements ISolve{
 	private Cam cam;
 	private Link follower;
 	private double rotation;

@@ -3,23 +3,24 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-
+import java.util.ArrayList;
 
 public class Animation extends JPanel implements ActionListener{
 	private Timer timer;
 	private JSlider speed;
+	private JLabel speedMarker;
 	private Link[] snapshot;
 	private SliderCrank[] pistons;
 	private CamFollower[] camfollowers;
 	private double instantRotationPistons;
 	private double instantRotationFollowers;
 	private double[] anglePistons, angleCams;
-	
+	private int cores;
 	
 	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut){
 		super();
-		int separation = 300;
+		int separation = 0;
+		cores = 2;
 		pistons = new SliderCrank[] {
 									 mechanism, 
 									 mechanism.copy(mechanism.getAbsoluteCoords().translate(separation, 0)),
@@ -40,12 +41,17 @@ public class Animation extends JPanel implements ActionListener{
 		timer = new Timer(1, this);
 		snapshot = new Link[28];
 		anglePistons = new double[] {0, Math.PI, Math.PI, 0};
+		//Max intake cam at 108° afeter TDC
+		//Max exhaust cam at 112°C before TDC
+		//Firing 1-3-4-2
 		angleCams = new double[] {
-								  -Math.PI/180*59, -Math.PI/180*59, -Math.PI/180*59, -Math.PI/180*59,
-								  0, 0, Math.PI/180*109, 0
+								  Math.PI/180*85, -Math.PI/180*5, Math.PI/180*175, -Math.PI/180*95,
+								  Math.PI/180*60, -Math.PI/180*30, Math.PI/180*150, -Math.PI/180*170
 								 };
 		speed = new JSlider();
+		speedMarker = new JLabel();
 		add(speed);
+		add(speedMarker);
 		updateSnapshot();
 		timer.start();
 	}
@@ -65,27 +71,77 @@ public class Animation extends JPanel implements ActionListener{
 	
 	
 	private void updateSnapshot(){
-		instantRotationPistons = -speed.getValue()*Math.PI/300;
-		instantRotationFollowers = -speed.getValue()*Math.PI/600;
+		instantRotationPistons = -speed.getValue()*Math.PI/60;
+		instantRotationFollowers = -speed.getValue()*Math.PI/120;
+		speedMarker.setText(""+(speed.getValue()*20)+" rpm"); //Just visual updates on screen don't allow to properly set correct speed
 		
 		for(int counter = 0; counter<anglePistons.length;counter++){
 			anglePistons[counter]+=instantRotationPistons;
 			angleCams[counter]+=instantRotationFollowers;
 			angleCams[counter+4]+=instantRotationFollowers;
 		}
-		System.arraycopy(pistons[0].solve(anglePistons[0], true), 0, snapshot, 0, 3);
-		System.arraycopy(pistons[1].solve(anglePistons[1], true), 0, snapshot, 3, 3);
-		System.arraycopy(pistons[2].solve(anglePistons[2], true), 0, snapshot, 6, 3);
-		System.arraycopy(pistons[3].solve(anglePistons[3], true), 0, snapshot, 9, 3);
-		System.arraycopy(camfollowers[0].solve(angleCams[0]), 0, snapshot, 12, 2);
-		System.arraycopy(camfollowers[1].solve(angleCams[1]), 0, snapshot, 14, 2);
-		System.arraycopy(camfollowers[2].solve(angleCams[2]), 0, snapshot, 16, 2);
-		System.arraycopy(camfollowers[3].solve(angleCams[3]), 0, snapshot, 18, 2);
 		
-		System.arraycopy(camfollowers[4].solve(angleCams[4]), 0, snapshot, 20, 2);
-		System.arraycopy(camfollowers[5].solve(angleCams[5]), 0, snapshot, 22, 2);
-		System.arraycopy(camfollowers[6].solve(angleCams[6]), 0, snapshot, 24, 2);
-		System.arraycopy(camfollowers[7].solve(angleCams[7]), 0, snapshot, 26, 2);
+		ArrayList<Thread> threadpool = new ArrayList<Thread>(cores);
+		ArrayList<AsyncSolution<SliderCrank>> solutions = new ArrayList<AsyncSolution<SliderCrank>>(4);
+		ArrayList<AsyncSolution<CamFollower>> solutionsCams = new ArrayList<AsyncSolution<CamFollower>>(4);
+		int remainder = pistons.length%cores;
+		int pistonsPerCore = pistons.length/cores;
+		SliderCrank[] arr;
+		CamFollower[] carr;
+		double[] rotationPistons, rotationCams;
+		
+		for(int counter = 0; counter<cores;counter++){
+			if(counter!=cores-1){
+				arr = new SliderCrank[pistonsPerCore];
+				carr = new CamFollower[pistonsPerCore*2];
+				rotationPistons = new double[pistonsPerCore];
+				rotationCams = new double[pistonsPerCore*2];
+				System.arraycopy(pistons, counter*pistonsPerCore, arr, 0, pistonsPerCore);
+				System.arraycopy(camfollowers, counter*pistonsPerCore*2, carr, 0, pistonsPerCore*2);
+				System.arraycopy(anglePistons, counter*pistonsPerCore, rotationPistons, 0, pistonsPerCore);
+				System.arraycopy(angleCams, counter*pistonsPerCore*2, rotationCams, 0, pistonsPerCore*2);
+			}else{
+				arr = new SliderCrank[pistonsPerCore+remainder];
+				carr = new CamFollower[(pistonsPerCore+remainder)*2];
+				rotationPistons = new double[pistonsPerCore+remainder];
+				rotationCams = new double[(pistonsPerCore+remainder)*2];
+				System.arraycopy(pistons, counter*pistonsPerCore, arr, 0, pistonsPerCore+remainder);
+				System.arraycopy(camfollowers, counter*pistonsPerCore*2, carr, 0, (pistonsPerCore+remainder)*2);
+				System.arraycopy(anglePistons, counter*pistonsPerCore, rotationPistons, 0, pistonsPerCore+remainder);
+				System.arraycopy(angleCams, counter*pistonsPerCore*2, rotationCams, 0, (pistonsPerCore+remainder)*2);
+			}
+			AsyncSolution<SliderCrank> async = new AsyncSolution<SliderCrank>(arr, rotationPistons);
+			solutions.add(async);
+			Thread thread = new Thread(async);
+			threadpool.add(thread);
+			thread.start();
+			AsyncSolution<CamFollower> asyncCam = new AsyncSolution<CamFollower>(carr, rotationCams);
+			solutionsCams.add(asyncCam);
+			thread = new Thread(asyncCam);
+			thread.start();
+			threadpool.add(thread);
+		}
+		
+		for(Thread t: threadpool){
+			try{
+				t.join();
+			}catch(InterruptedException e){
+				System.out.println("Could not solve");
+			}
+		}
+		
+		Link[] snap;
+		int pointer = 0;
+		for(AsyncSolution<SliderCrank> t: solutions){
+			snap = t.getSolutions();
+			System.arraycopy(snap, 0, snapshot, pointer, snap.length);
+			pointer+=snap.length;
+		}
+		for(AsyncSolution<CamFollower> t: solutionsCams){
+			snap = t.getSolutions();
+			System.arraycopy(snap, 0, snapshot, pointer, snap.length);
+			pointer+=snap.length;
+		}
 		
 	}
 	
@@ -95,10 +151,6 @@ public class Animation extends JPanel implements ActionListener{
 		repaint();
 	}
 	
-	
-	/*private class Chamber implements Runnable{
-		
-	}*/
 }
 
 

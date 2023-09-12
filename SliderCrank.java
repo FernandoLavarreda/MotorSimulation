@@ -1,10 +1,11 @@
 
 
-public class SliderCrank{
+public class SliderCrank implements ISolve{
 	private Link[] links;
 	private double displacement, rotation;
 	private double[] lengths;
 	private Vector absoluteCoords;
+	private boolean inversion;
 	
 	public SliderCrank(Link[] links, double displacement, double rotation, Vector absoluteCoords) throws IllegalArgumentException{
 		if (links.length != 3) throw new IllegalArgumentException("Only three links can be part of a SliderCrank");
@@ -21,6 +22,13 @@ public class SliderCrank{
 		this.lengths[0] = Vector.distance(links[0].getConnection(0), links[0].getConnection(1));
 		this.lengths[1] = Vector.distance(links[1].getConnection(0), links[1].getConnection(1));
 		this.absoluteCoords = absoluteCoords;
+		this.inversion = true;
+	}
+	
+	
+	public SliderCrank(Link[] links, double displacement, double rotation, Vector absoluteCoords, boolean inversion){
+		this(links, displacement, rotation, absoluteCoords);
+		this.inversion = inversion;
 	}
 	
 	
@@ -29,7 +37,7 @@ public class SliderCrank{
 	}
 	
 	
-	public Link[] solve(double rad, boolean inversion){
+	public Link[] solve(double rad){
 		double angle_coupler, dx, dy;
 		Link[] lnks = new Link[3];
 		
@@ -63,7 +71,7 @@ public class SliderCrank{
 			lnks[counter++] = t.copy();
 		}
 		lnks[2] = lnks[2].rotate(rotation);
-		return new SliderCrank(lnks, displacement, rotation, absoluteCoords);
+		return new SliderCrank(lnks, displacement, rotation, absoluteCoords, inversion);
 	}
 	
 }
