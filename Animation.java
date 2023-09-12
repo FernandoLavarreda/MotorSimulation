@@ -57,7 +57,8 @@ public class Animation extends JPanel implements ActionListener{
 		add(speedMarker);
 		updateSnapshot();
 		timer.start();
-		setPreferredSize(new Dimension(600, 900));
+		speed.setValue(1);
+		setPreferredSize(new Dimension(1500, 900));
 	}
 	
 	
@@ -75,8 +76,8 @@ public class Animation extends JPanel implements ActionListener{
 	
 	
 	private void updateSnapshot(){
-		instantRotationPistons = -speed.getValue()*Math.PI/60;
-		instantRotationFollowers = -speed.getValue()*Math.PI/120;
+		instantRotationPistons = -speed.getValue()*Math.PI/300;
+		instantRotationFollowers = -speed.getValue()*Math.PI/600;
 		speedMarker.setText(""+(speed.getValue()*20)+" rpm"); //Just visual updates on screen don't allow to properly set correct speed
 		
 		for(int counter = 0; counter<anglePistons.length;counter++){
