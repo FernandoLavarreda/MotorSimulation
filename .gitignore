@@ -1,2 +1,4 @@
 *.class
 run/
+dist/
+build/
