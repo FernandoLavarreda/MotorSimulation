@@ -13,34 +13,46 @@ public class MotorSimulation{
 		try {
 			UIManager.setLookAndFeel(new FlatDarkLaf());
 		}catch (Exception e) {
+			System.out.println("Did not find UI requested");
 			System.out.println(e);
 		}
-		String followerInLoc = "C:\\Users\\ferna\\Downloads\\followeri.csv";
-		String camInLoc = "C:\\Users\\ferna\\Downloads\\cami.csv";
-		String followerOutLoc = "C:\\Users\\ferna\\Downloads\\followero.csv";
-		String camOutLoc = "C:\\Users\\ferna\\Downloads\\camo.csv";
-		String chamber = "C:\\Users\\ferna\\Downloads\\chamber.csv";
+		
+		if(args.length<1){
+			System.out.println("No file location provided");
+			System.exit(1);
+		}
+		
+		int separation = 300;
+		
+		String pistonLoc = args[0]+"\\cabezal.csv";
+		String crankLoc = args[0]+"\\ciguenal.csv";
+		String couplerLoc = args[0]+"\\biela.csv";
+		String followerInLoc = args[0]+"\\followeri.csv";
+		String camInLoc = args[0]+"\\cami.csv";
+		String followerOutLoc = args[0]+"\\followero.csv";
+		String camOutLoc = args[0]+"\\camo.csv";
+		String chamber = args[0]+"\\chamber.csv";
 		
 		
-		SliderCrank mech = MotorSimulation.buildPiston();
+		SliderCrank mech = MotorSimulation.buildPiston(pistonLoc, crankLoc, couplerLoc);
 		CamFollower camIn = MotorSimulation.buildCamFollower(followerInLoc, camInLoc, Math.PI/180*70, new Vector(246, 205));
 		CamFollower camOut = MotorSimulation.buildCamFollower(followerOutLoc, camOutLoc, Math.PI/180*110, new Vector(359, 210));
 		Link backgroundLink = Link.buildIO(new FileInputStream(new File(chamber))).rotate(Math.PI).translate(300, 550);
-		Link[] background  = {backgroundLink, backgroundLink.translate(300, 0), backgroundLink.translate(600, 0), backgroundLink.translate(900, 0)};
+		Link[] background  = {backgroundLink, backgroundLink.translate(separation, 0), backgroundLink.translate(separation*2, 0), backgroundLink.translate(separation*3, 0)};
 		
 		
 		JFrame frame = new JFrame("MotorSim");
-		frame.add(new Animation(mech, camIn, camOut, background));
+		frame.add(new Animation(mech, camIn, camOut, background, separation));
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 	
 	
-	public static SliderCrank buildPiston() throws IOException{
-		Link piston = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\cabezal.csv")));
-		Link crank = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\ciguenal.csv")));
-		Link coupler = Link.buildIO(new FileInputStream(new File("C:\\Users\\ferna\\Downloads\\biela.csv")));
+	public static SliderCrank buildPiston(String pistonLoc, String crankLoc, String couplerLoc) throws IOException{
+		Link piston = Link.buildIO(new FileInputStream(new File(pistonLoc)));
+		Link crank = Link.buildIO(new FileInputStream(new File(crankLoc)));
+		Link coupler = Link.buildIO(new FileInputStream(new File(couplerLoc)));
 		Link[] links = {crank, coupler, piston};
 		Vector[] conCoupler = {new Vector(20, 10.64), new Vector(20, 158)};
 		Vector[] conPiston = {new Vector(17, 0), new Vector(17, 0)};

@@ -18,10 +18,9 @@ public class Animation extends JPanel implements ActionListener{
 	private int cores;
 	private long time = System.currentTimeMillis();
 	
-	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background){
+	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background, int separation){
 		super();
 		cores = 4;
-		int separation = 300;
 		
 		pistons = new SliderCrank[] {
 									 mechanism, 
@@ -76,8 +75,8 @@ public class Animation extends JPanel implements ActionListener{
 	
 	private void updateSnapshot(){
 		long follows = System.currentTimeMillis();
-		instantRotationPistons = -speed.getValue()*Math.PI/100;
-		instantRotationFollowers = -speed.getValue()*Math.PI/200;
+		instantRotationPistons = -speed.getValue()*Math.PI/150;
+		instantRotationFollowers = -speed.getValue()*Math.PI/300;
 		speedMarker.setText(""+(Math.abs((int)(instantRotationPistons*30_000/Math.PI)/(follows-time)))+" rpm"); //Just visual updates on screen don't allow to properly set correct speed
 		time = follows;
 		for(int counter = 0; counter<anglePistons.length;counter++){
