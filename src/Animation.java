@@ -16,11 +16,11 @@ public class Animation extends JPanel implements ActionListener{
 	private double instantRotationFollowers;
 	private double[] anglePistons, angleCams;
 	private int cores;
-	private static int c = 1;
+	private long time = System.currentTimeMillis();
 	
 	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background){
 		super();
-		cores = 2;
+		cores = 1;
 		int separation = 300;
 		
 		pistons = new SliderCrank[] {
@@ -75,10 +75,11 @@ public class Animation extends JPanel implements ActionListener{
 	
 	
 	private void updateSnapshot(){
-		instantRotationPistons = -speed.getValue()*Math.PI/150;
-		instantRotationFollowers = -speed.getValue()*Math.PI/300;
-		speedMarker.setText(""+(speed.getValue()*6)+" rpm"); //Just visual updates on screen don't allow to properly set correct speed
-		
+		long follows = System.currentTimeMillis();
+		instantRotationPistons = -speed.getValue()*Math.PI/100;
+		instantRotationFollowers = -speed.getValue()*Math.PI/200;
+		speedMarker.setText(""+(Math.abs((int)(instantRotationPistons*30_000/Math.PI)/(follows-time)))+" rpm"); //Just visual updates on screen don't allow to properly set correct speed
+		time = follows;
 		for(int counter = 0; counter<anglePistons.length;counter++){
 			anglePistons[counter]+=instantRotationPistons;
 			angleCams[counter]+=instantRotationFollowers;
