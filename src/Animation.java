@@ -20,7 +20,7 @@ public class Animation extends JPanel implements ActionListener{
 	
 	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background){
 		super();
-		cores = 1;
+		cores = 4;
 		int separation = 300;
 		
 		pistons = new SliderCrank[] {
