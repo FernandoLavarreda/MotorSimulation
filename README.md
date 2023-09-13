@@ -1,7 +1,8 @@
 # MotorSimulation
 Simulation of inline-four motor with the firing order 1-3-4-2
 
-https://github.com/FernandoLavarreda/MotorSimulation/assets/70668651/c8c5d1cf-0762-4b9d-a611-4dfc3ca01eb4
+
+https://github.com/FernandoLavarreda/MotorSimulation/assets/70668651/5f2e1e8e-e821-438b-9c68-a48ab583f974
 
 
 ## Measurements
@@ -16,14 +17,28 @@ The cams for the intake valves base radius: 40mm, lift 11mm, sinusoidal curve ma
 Timing was made based on max lift from cams in relation to the TDC of the pistons. Exhaust max lift was set 112° before TDC, Intake max lift was set 108° after TDC.
 
 ## Build
+### Linux & Mac
 ```
 git clone https://github.com/FernandoLavarreda/MotorSimulation
 cd MotorSimulation\src
-javac -cp ".(colon ':' or semicolon ';' depending platform)..\thirdparty\flatlaf.jar" *.java -d "..\run"
+javac -cp ".:..\thirdparty\flatlaf.jar" *.java -d "..\run"
+```
+
+### Windows
+```
+git clone https://github.com/FernandoLavarreda/MotorSimulation
+cd MotorSimulation\src
+javac -cp ".;..\thirdparty\flatlaf.jar" *.java -d "..\run"
 ```
 
 ## Run
+### Linux & Mac
 ```
 cd ..\run
-java -cp ".(colon ':' or semicolon ';' depending platform)..\thirdparty\flatlaf.jar" MotorSimulation "..\resources"
+java -cp ".:..\thirdparty\flatlaf.jar" MotorSimulation "..\resources"
+```
+### Windows
+```
+cd ..\run
+java -cp ".;..\thirdparty\flatlaf.jar" MotorSimulation "..\resources"
 ```
