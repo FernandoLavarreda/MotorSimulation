@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 
 public class AsyncSolution <T extends ISolve> implements Runnable {

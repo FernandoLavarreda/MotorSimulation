@@ -120,6 +120,27 @@ public class Cam extends Link{
 	}
 	
 	
+	public Cam scale(double factor){
+		Curve[] ncurves = new Curve[curves.length];
+		Vector[] nvectors = new Vector[connections.length];
+		Double[] rads = new Double[radiuses.length];
+		int counter = 0;
+		for(Curve t: curves){
+			ncurves[counter++] = t.scale(factor);
+		}
+		
+		counter = 0;
+		for(Vector t: connections){
+			nvectors[counter++] = t.scale(factor);
+		}
+		counter=0;
+		for(Double radius: radiuses){
+			rads[counter++] = radius*factor;
+		}
+		
+		return new Cam(ncurves, nvectors, angles, rads);
+	}
+	
 	public Cam copy(){
 		Curve[] crvs = new Curve[curves.length];
 		Vector[] cons = new Vector[connections.length];

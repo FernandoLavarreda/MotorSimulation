@@ -1,3 +1,4 @@
 public interface ISolve{
-	Link[] solve(double angle);
+	public Link[] solve(double angle);
+	public double height(double angle);
 }

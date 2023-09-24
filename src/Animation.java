@@ -17,10 +17,12 @@ public class Animation extends JPanel implements ActionListener{
 	private double[] anglePistons, angleCams;
 	private int cores;
 	private long time = System.currentTimeMillis();
+	private Plotter[] plots;
+	private double[][] pistonHeights, camHeights;
 	
-	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background, int separation){
+	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background, int separation, Plotter[] plots){
 		super();
-		cores = 4;
+		cores = 4; //Should be [1-4] -- Only 4 works with current implementation of plots
 		
 		pistons = new SliderCrank[] {
 									 mechanism, 
@@ -39,7 +41,31 @@ public class Animation extends JPanel implements ActionListener{
 										  camfollowerOut.copy(camfollowerOut.getAbsoluteCoords().translate(separation*2, 0)),
 										  camfollowerOut.copy(camfollowerOut.getAbsoluteCoords().translate(separation*3, 0))
 										  };
-		timer = new Timer(1, this);
+		
+		//Offset exhaust valves  so they have same height as intake
+		for(int counter=4;counter<camfollowers.length;counter++){
+			camfollowers[counter].setOffset(5.0);
+		}
+		
+		pistonHeights = new double[][] {
+					plots[0].getDatay()[0], 
+					plots[1].getDatay()[0],
+					plots[2].getDatay()[0],
+					plots[3].getDatay()[0],
+		};
+		
+		camHeights = new double[][] {
+					plots[0].getDatay()[1], 
+					plots[1].getDatay()[1],
+					plots[2].getDatay()[1],
+					plots[3].getDatay()[1],
+					plots[0].getDatay()[2],
+					plots[1].getDatay()[2],
+					plots[2].getDatay()[2],
+					plots[3].getDatay()[2],
+		};
+		
+		timer = new Timer(10, this);
 		snapshot = new Link[28+background.length];
 		System.arraycopy(background, 0, snapshot, 28, background.length);
 		anglePistons = new double[] {0, Math.PI, Math.PI, 0};
@@ -54,9 +80,10 @@ public class Animation extends JPanel implements ActionListener{
 		speedMarker = new JLabel();
 		add(speed);
 		add(speedMarker);
+		this.plots = plots;
 		updateSnapshot();
 		timer.start();
-		setPreferredSize(new Dimension(1500, 900));
+		setPreferredSize(new Dimension(1000, 900));
 	}
 	
 	
@@ -70,6 +97,7 @@ public class Animation extends JPanel implements ActionListener{
 				g2d.drawPolyline(xs, ys, xs.length);
 			}
 		}
+		
 	}
 	
 	
@@ -94,6 +122,10 @@ public class Animation extends JPanel implements ActionListener{
 		CamFollower[] carr;
 		double[] rotationPistons, rotationCams;
 		
+		double[][] heightsPistons, heightsCams;
+		int remainderGraphs = plots.length%cores;
+		int graphsPerCore = plots.length/cores;
+		
 		for(int counter = 0; counter<cores;counter++){
 			if(counter!=cores-1){
 				arr = new SliderCrank[pistonsPerCore];
@@ -104,6 +136,14 @@ public class Animation extends JPanel implements ActionListener{
 				System.arraycopy(camfollowers, counter*pistonsPerCore*2, carr, 0, pistonsPerCore*2);
 				System.arraycopy(anglePistons, counter*pistonsPerCore, rotationPistons, 0, pistonsPerCore);
 				System.arraycopy(angleCams, counter*pistonsPerCore*2, rotationCams, 0, pistonsPerCore*2);
+				//Graphs
+				heightsPistons = new double[graphsPerCore][];
+				heightsCams = new double[graphsPerCore*2][];
+				for(int i = 0; i<graphsPerCore;i++){
+					heightsPistons[i] = pistonHeights[counter+i];
+					heightsCams[i*2] = camHeights[(counter+i)*2];
+					heightsCams[i*2+1] = camHeights[(counter+i)*2+1];
+				}
 			}else{
 				arr = new SliderCrank[pistonsPerCore+remainder];
 				carr = new CamFollower[(pistonsPerCore+remainder)*2];
@@ -113,6 +153,14 @@ public class Animation extends JPanel implements ActionListener{
 				System.arraycopy(camfollowers, counter*pistonsPerCore*2, carr, 0, (pistonsPerCore+remainder)*2);
 				System.arraycopy(anglePistons, counter*pistonsPerCore, rotationPistons, 0, pistonsPerCore+remainder);
 				System.arraycopy(angleCams, counter*pistonsPerCore*2, rotationCams, 0, (pistonsPerCore+remainder)*2);
+				//Graphs
+				heightsPistons = new double[remainderGraphs+graphsPerCore][];
+				heightsCams = new double[(remainderGraphs+graphsPerCore)*2][];
+				for(int i = 0; i<graphsPerCore+remainderGraphs;i++){
+					heightsPistons[i] = pistonHeights[counter+i];
+					heightsCams[i*2] = camHeights[(counter+i)*2];
+					heightsCams[i*2+1] = camHeights[(counter+i)*2+1];
+				}
 			}
 			AsyncSolution<SliderCrank> async = new AsyncSolution<SliderCrank>(arr, rotationPistons);
 			solutions.add(async);
@@ -122,6 +170,14 @@ public class Animation extends JPanel implements ActionListener{
 			AsyncSolution<CamFollower> asyncCam = new AsyncSolution<CamFollower>(carr, rotationCams);
 			solutionsCams.add(asyncCam);
 			thread = new Thread(asyncCam);
+			thread.start();
+			threadpool.add(thread);
+			AsyncSolutionHeight<SliderCrank> heightscranks = new AsyncSolutionHeight<SliderCrank>(arr, rotationPistons, heightsPistons);
+			thread = new Thread(heightscranks);
+			thread.start();
+			threadpool.add(thread);
+			AsyncSolutionHeight<CamFollower> heightscams = new AsyncSolutionHeight<CamFollower>(carr, rotationCams, heightsCams);
+			thread = new Thread(heightscams);
 			thread.start();
 			threadpool.add(thread);
 		}
@@ -152,6 +208,9 @@ public class Animation extends JPanel implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e){
 		updateSnapshot();
+		for(Plotter p: plots){
+			p.repaint();
+		}
 		repaint();
 	}
 	
