@@ -2,7 +2,7 @@
 Simulation of inline-four motor with the firing order 1-3-4-2
 
 
-https://github.com/FernandoLavarreda/MotorSimulation/assets/70668651/5f2e1e8e-e821-438b-9c68-a48ab583f974
+https://github.com/FernandoLavarreda/MotorSimulation/assets/70668651/1e61e475-06eb-4c46-9279-0788b1ee8e32
 
 
 ## Measurements
