@@ -54,7 +54,7 @@ public class MotorSimulation{
 		
 		
 		Plotter[] plots = new Plotter[4];
-		int size = 200;
+		int size = 300;
 		double[][] xs, ys;
 		Color[] colors = {new Color(255, 255, 255), new Color(0, 255, 0), new Color(255, 0, 0)};
 		for(int plot=0; plot<plots.length;plot++){

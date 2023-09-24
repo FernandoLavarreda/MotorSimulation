@@ -15,7 +15,7 @@ public class Animation extends JPanel implements ActionListener{
 	private double instantRotationPistons;
 	private double instantRotationFollowers;
 	private double[] anglePistons, angleCams;
-	private int cores;
+	private int cores, separation, start;
 	private long time = System.currentTimeMillis();
 	private Plotter[] plots;
 	private double[][] pistonHeights, camHeights;
@@ -23,7 +23,8 @@ public class Animation extends JPanel implements ActionListener{
 	public Animation(SliderCrank mechanism, CamFollower camfollowerIn, CamFollower camfollowerOut, Link[] background, int separation, Plotter[] plots){
 		super();
 		cores = 4; //Should be [1-4] -- Only 4 works with current implementation of plots
-		
+		this.separation= separation;
+		this.start = (int) mechanism.getAbsoluteCoords().getX();
 		pistons = new SliderCrank[] {
 									 mechanism, 
 									 mechanism.copy(mechanism.getAbsoluteCoords().translate(separation, 0)),
@@ -68,7 +69,7 @@ public class Animation extends JPanel implements ActionListener{
 		timer = new Timer(10, this);
 		snapshot = new Link[28+background.length];
 		System.arraycopy(background, 0, snapshot, 28, background.length);
-		anglePistons = new double[] {0, Math.PI, Math.PI, 0};
+		anglePistons = new double[] {0, -Math.PI, -Math.PI, 0};
 		//Max intake cam at 108° afeter TDC
 		//Max exhaust cam at 112°C before TDC
 		//Firing 1-3-4-2
@@ -77,6 +78,7 @@ public class Animation extends JPanel implements ActionListener{
 								  Math.PI/180*35, -Math.PI/180*55, Math.PI/180*125, -Math.PI/180*145
 								 };
 		speed = new JSlider();
+		speed.setValue(0);
 		speedMarker = new JLabel();
 		add(speed);
 		add(speedMarker);
@@ -97,7 +99,23 @@ public class Animation extends JPanel implements ActionListener{
 				g2d.drawPolyline(xs, ys, xs.length);
 			}
 		}
-		
+		g2d.setColor(Color.RED);
+		if(Math.abs((anglePistons[0]+3*Math.PI)%(4*Math.PI))<0.3){
+			g2d.fillOval(start-5, 300, 10, 10);
+			return;
+		}
+		if(Math.abs((anglePistons[1]+3*Math.PI)%(4*Math.PI))<0.3){
+			g2d.fillOval(start+separation-5, 300, 10, 10);
+			return;
+		}
+		if(Math.abs((anglePistons[2]+Math.PI)%(4*Math.PI))<0.3){
+			g2d.fillOval(start+separation*2-5, 300, 10, 10);
+			return;
+		}
+		if(Math.abs((anglePistons[3]+Math.PI)%(4*Math.PI))<0.3){
+			g2d.fillOval(start+separation*3-5, 300, 10, 10);
+			return;
+		}
 	}
 	
 	
