@@ -30,6 +30,7 @@ git clone https://github.com/FernandoLavarreda/MotorSimulation
 cd MotorSimulation\src
 javac -cp ".;..\thirdparty\flatlaf.jar" *.java -d "..\run"
 ```
+Alternatively access the installer in <a href="https://github.com/FernandoLavarreda/MotorSimulation/releases">Releases</a>.
 
 ## Run
 ### Linux & Mac
