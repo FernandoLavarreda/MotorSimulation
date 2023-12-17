@@ -28,14 +28,14 @@ public class MotorSimulation{
 		int separation = (int)(250*scale);
 		
 		
-		String pistonLoc = args[0]+"\\cabezal.csv";
-		String crankLoc = args[0]+"\\ciguenal.csv";
-		String couplerLoc = args[0]+"\\biela.csv";
-		String followerInLoc = args[0]+"\\followeri.csv";
-		String camInLoc = args[0]+"\\cami.csv";
-		String followerOutLoc = args[0]+"\\followero.csv";
-		String camOutLoc = args[0]+"\\camo.csv";
-		String chamber = args[0]+"\\chamber.csv";
+		String pistonLoc = args[0]+"/cabezal.csv";
+		String crankLoc = args[0]+"/ciguenal.csv";
+		String couplerLoc = args[0]+"/biela.csv";
+		String followerInLoc = args[0]+"/followeri.csv";
+		String camInLoc = args[0]+"/cami.csv";
+		String followerOutLoc = args[0]+"/followero.csv";
+		String camOutLoc = args[0]+"/camo.csv";
+		String chamber = args[0]+"/chamber.csv";
 		
 		
 		SliderCrank mech = MotorSimulation.buildPiston(pistonLoc, crankLoc, couplerLoc).scale(scale);

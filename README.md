@@ -20,8 +20,8 @@ Timing was made based on max lift from cams in relation to the TDC of the piston
 ### Linux & Mac
 ```console
 git clone https://github.com/FernandoLavarreda/MotorSimulation
-cd MotorSimulation\src
-javac -cp ".:..\thirdparty\flatlaf.jar" *.java -d "..\run"
+cd MotorSimulation/src
+javac -cp ".:../thirdparty/flatlaf.jar" *.java -d "../run"
 ```
 
 ### Windows
@@ -34,9 +34,10 @@ javac -cp ".;..\thirdparty\flatlaf.jar" *.java -d "..\run"
 ## Run
 ### Linux & Mac
 ```console
-cd ..\run
-java -cp ".:..\thirdparty\flatlaf.jar" MotorSimulation "..\resources"
+cd ../run
+java -cp ".:../thirdparty/flatlaf.jar" MotorSimulation "../resources"
 ```
+
 ### Windows
 ```console
 cd ..\run
